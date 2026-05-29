@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LO QUIERO! — Catálogo</title>
+  <link rel="icon" href="assets/images/favicon.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-text">LO <span>QUIERO!</span></div>
+  </div>
+  <div class="header-search">
+    <!-- Search icon: Lucide "search" via CDN SVG -->
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" id="searchInput" placeholder="Buscar productos..." />
+  </div>
+  <div class="header-actions">
+    <!-- Estrella favoritos -->
+    <button class="btn-icon" title="Favoritos" onclick="switchSidebarTab('favs')">
+      <svg class="icon-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      <span class="badge" id="favBadge">0</span>
+    </button>
+    <!-- Botón + agregar producto -->
+    <div tabindex="0" class="plusButton" onclick="openAdmin()" title="Agregar producto">
+      <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+        <g mask="url(#mask0_21_345)">
+          <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR TOGGLE -->
+<button class="sidebar-toggle collapsed-btn" id="sidebarToggle" onclick="toggleSidebar()" title="Mostrar panel">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="15 18 9 12 15 6"/>
+  </svg>
+</button>
+
+<div class="main-layout">
+
+  <!-- SIDEBAR (starts collapsed) -->
+  <aside class="sidebar collapsed" id="mainSidebar">
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" id="tab-filters" onclick="switchSidebarTab('filters')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filtros
+      </button>
+      <button class="sidebar-tab" id="tab-favs" onclick="switchSidebarTab('favs')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Favoritos
+      </button>
+      <button class="sidebar-tab" id="tab-comments" onclick="switchSidebarTab('comments')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Comentarios
+      </button>
+    </div>
+
+    <!-- Filters panel -->
+    <div class="sidebar-panel active" id="panel-filters">
+      <div class="filter-section">
+        <h4>Categoría</h4>
+        <div class="filter-tags" id="categoryFilters">
+          <button class="filter-tag active" data-cat="all"        onclick="filterByCategory(this)">Todos</button>
+          <button class="filter-tag"        data-cat="Tecnología"  onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            Tecnología
+          </button>
+          <button class="filter-tag"        data-cat="Hogar"       onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Hogar
+          </button>
+          <button class="filter-tag"        data-cat="Cocina"      onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+            Cocina
+          </button>
+          <button class="filter-tag"        data-cat="Baño"        onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            Baño
+          </button>
+          <button class="filter-tag"        data-cat="Vestimenta"  onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
+            Vestimenta
+          </button>
+          <button class="filter-tag"        data-cat="Sábanas"     onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            Blamquería
+          </button>
+          <button class="filter-tag"        data-cat="Juguetes"    onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            Juguetes
+          </button>
+          <button class="filter-tag"        data-cat="Calzado"     onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 18v-6c0-1 .5-2 1.3-2.6L9 5l1 1-5 4h4l5.3-3.3a2 2 0 0 1 2.8.6l.4.6A2 2 0 0 1 17 10h3a2 2 0 0 1 2 2v1a5 5 0 0 1-5 5H4a2 2 0 0 1-2-2z"/></svg>
+            Calzado
+          </button>
+          <button class="filter-tag"        data-cat="Accesorios"  onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+            Accesorios
+          </button>
+          <button class="filter-tag"        data-cat="Otro"        onclick="filterByCategory(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+            Otro
+          </button>
+        </div>
+      </div>
+      <div class="filter-section">
+        <h4>Precio</h4>
+        <div class="price-row">
+          <input type="number" id="priceMin" placeholder="Mín $" min="0" oninput="applyFilters()" />
+          <span>—</span>
+          <input type="number" id="priceMax" placeholder="Máx $" min="0" oninput="applyFilters()" />
+        </div>
+      </div>
+      <div class="filter-section">
+        <h4>Estado</h4>
+        <div class="filter-tags">
+          <button class="filter-tag active" data-status="all"   onclick="filterByStatus(this)">Todos</button>
+          <button class="filter-tag"        data-status="nuevo" onclick="filterByStatus(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Nuevo
+          </button>
+          <button class="filter-tag"        data-status="usado" onclick="filterByStatus(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Usado
+          </button>
+        </div>
+      </div>
+      <div class="filter-section">
+        <h4>Disponibilidad</h4>
+        <div class="filter-tags">
+          <button class="filter-tag active" data-stock="all" onclick="filterByStock(this)">Todos</button>
+          <button class="filter-tag"        data-stock="1"   onclick="filterByStock(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="20 6 9 17 4 12"/></svg>
+            En stock
+          </button>
+          <button class="filter-tag"        data-stock="0"   onclick="filterByStock(this)">
+            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Sin stock
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Favs panel -->
+    <div class="sidebar-panel" id="panel-favs">
+      <div class="fav-list" id="favList">
+        <div class="fav-empty" id="favEmpty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <p>Todavía no guardaste favoritos.<br/>¡Tocá la estrella de un producto!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments panel -->
+    <div class="sidebar-panel" id="panel-comments">
+      <div class="comment-section">
+        <div class="comment-intro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="vertical-align:middle;margin-right:4px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          ¿Tenés alguna consulta, queja o sugerencia sobre la página? Escribinos y le llegará directamente a <strong>Carina</strong>.
+        </div>
+        <div class="comment-form">
+          <input type="text" id="commentName" placeholder="Tu nombre (opcional)" />
+          <textarea id="commentText" placeholder="Escribí tu mensaje acá..."></textarea>
+          <button class="btn-send" onclick="sendComment()">Enviar mensaje
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+          <div class="comment-success" id="commentSuccess">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+            ¡Mensaje enviado! Carina lo recibirá pronto.
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CATALOG AREA -->
+  <main class="catalog-area" id="catalogArea">
+
+    <!-- Hero banner (imagen/video de fondo) -->
+    <div class="hero-banner">
+      <!--
+        Para usar imagen: agregá style="background-image:url('assets/images/banner.jpg')"
+        Para usar video: descomentá el bloque video de abajo
+      -->
+      <!--
+      <video class="hero-video" autoplay muted loop playsinline>
+        <source src="assets/videos/banner.mp4" type="video/mp4" />
+      </video>
+      -->
+      <div class="hero-overlay"></div>
+      <div class="hero-text">
+        <h2>¡TODO LO QUE <span>QUERÉS</span><br/>EN UN LUGAR!</h2>
+        <p>Tecnología · Hogar · Moda · Cocina y mucho más</p>
+      </div>
+    </div>
+
+    <!-- SECCIONES ESPECIALES: Nuevos, Recién vistos, Recomendados -->
+    <div id="specialSections"></div>
+
+    <!-- CARRUSELES POR CATEGORÍA -->
+    <div id="carouselsSection"></div>
+
+    <!-- Sort row + All Products -->
+    <div id="allProductsSection">
+      <div class="filters-row">
+        <span style="font-size:0.85rem; font-weight:700; color:var(--gray)" id="resultCount">Cargando...</span>
+        <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+          <option value="default">Ordenar: Destacados</option>
+          <option value="price-asc">Precio: menor a mayor</option>
+          <option value="price-desc">Precio: mayor a menor</option>
+          <option value="name-asc">Nombre A–Z</option>
+        </select>
+      </div>
+      <div class="section-title-row">
+        <h3 class="section-title">Todos los productos</h3>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">LO <span>QUIERO!</span></div>
+  <div class="footer-links">
+    <a href="https://wa.me/5493445440326" class="footer-link wa" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <a href="https://instagram.com/loquiero" class="footer-link ig" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      Instagram
+    </a>
+  </div>
+  <div class="footer-copy">© 2025 LO QUIERO! — Todos los derechos reservados</div>
+</footer>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" style="vertical-align:middle;margin-right:6px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        AGREGAR PRODUCTO
+      </h3>
+      <button class="modal-close" onclick="closeAdmin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Auth screen -->
+    <div id="authScreen" class="admin-auth">
+      <h4>Acceso exclusivo para Carina ✨</h4>
+      <input type="password" id="adminPass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')checkAuth()" />
+      <div class="auth-error" id="authError">Contraseña incorrecta. Intentá de nuevo.</div>
+      <button class="btn-submit-product" onclick="checkAuth()">Entrar →</button>
+    </div>
+
+    <!-- Admin form -->
+    <div id="adminForm" style="display:none">
+      <div style="display:flex;gap:0.5rem;margin-bottom:1.2rem">
+        <button class="filter-tag active" id="adminTab1" onclick="switchAdminTab(1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nuevo producto
+        </button>
+        <button class="filter-tag" id="adminTab2" onclick="switchAdminTab(2)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Mis productos
+        </button>
+      </div>
+
+      <div id="adminAddPanel">
+        <!-- Fotos con previsualización y botón borrar -->
+        <div class="form-group">
+          <label>Fotos del producto</label>
+          <div class="upload-area" id="uploadArea">
+            <input type="file" id="photoUpload" accept="image/*" multiple onchange="previewImages()" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32" style="color:var(--orange-light)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p>Tocá para subir una o varias fotos</p>
+            <span class="upload-hint">JPG, PNG, WEBP</span>
+          </div>
+          <div class="preview-imgs" id="previewImgs"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Nombre del producto *</label>
+          <input type="text" id="prodName" placeholder="Ej: Auriculares Bluetooth" />
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="prodDesc" placeholder="Describí el producto..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Categoría *</label>
+          <div class="tags-select" id="tagsPicker">
+            <button class="tag-option" onclick="toggleTag(this,'Tecnología')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              Tecnología
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Hogar')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Hogar
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Cocina')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+              Cocina
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Baño')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+              Baño
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Vestimenta')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
+              Vestimenta
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Sábanas')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              Sábanas
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Juguetes')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              Juguetes
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Calzado')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M2 18v-6c0-1 .5-2 1.3-2.6L9 5l1 1-5 4h4l5.3-3.3a2 2 0 0 1 2.8.6l.4.6A2 2 0 0 1 17 10h3a2 2 0 0 1 2 2v1a5 5 0 0 1-5 5H4a2 2 0 0 1-2-2z"/></svg>
+              Calzado
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Accesorios')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+              Accesorios
+            </button>
+            <button class="tag-option" onclick="toggleTag(this,'Otro')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+              Otro
+            </button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group">
+            <label>Precio ($) *</label>
+            <input type="number" id="prodPrice" placeholder="0.00" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Estado <span style="font-weight:400;color:var(--gray);font-size:0.75rem">(opcional)</span></label>
+            <div class="toggle-row" style="margin-top:0.5rem">
+              <label class="toggle-opt"><input type="checkbox" id="chkNuevo" value="nuevo" /> Nuevo</label>
+              <label class="toggle-opt"><input type="checkbox" id="chkUsado" value="usado" /> Usado</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Disponibilidad</label>
+          <div class="toggle-row">
+            <label class="toggle-opt">
+              <input type="radio" name="prodStock" value="1" checked />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+              En stock
+            </label>
+            <label class="toggle-opt">
+              <input type="radio" name="prodStock" value="0" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Sin stock
+            </label>
+          </div>
+        </div>
+        <button class="btn-submit-product" onclick="addProduct()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          PUBLICAR PRODUCTO
+        </button>
+      </div>
+
+      <div id="adminManagePanel" style="display:none">
+        <div class="manage-list" id="manageList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>DETALLE</h3>
+      <button class="modal-close" onclick="closeDetail()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
