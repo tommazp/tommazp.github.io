@@ -143,6 +143,37 @@ function scrollCarousel(id, dir) {
   track.style.transform = `translateX(-${carouselOffsets[id]}px)`;
 }
 
+// Mejorar carruseles para touch en móvil
+function initMobileCarousels() {
+  if (window.innerWidth <= 768) {
+    document.querySelectorAll('.carousel-track-wrap').forEach(wrap => {
+      let isDragging = false;
+      let startX, scrollLeft;
+      
+      wrap.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].pageX - wrap.offsetLeft;
+        scrollLeft = wrap.scrollLeft;
+      });
+      
+      wrap.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.touches[0].pageX - wrap.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        wrap.scrollLeft = scrollLeft - walk;
+      });
+      
+      wrap.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+    });
+  }
+}
+
+// Llamar después de renderizar
+document.addEventListener('DOMContentLoaded', initMobileCarousels);
+
 // ==================== SPECIAL SECTIONS ====================
 // Recommended: mix of top-priced in-stock + products from categories user viewed most
 function getRecommended() {
