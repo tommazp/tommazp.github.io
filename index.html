@@ -2,406 +2,1217 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LO QUIERO! — Catálogo</title>
-  <link rel="icon" href="assets/images/favicon.png" type="image/png" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Encontrá todo lo que querés: tecnología, hogar, cocina, blanquería y más. Encargá por WhatsApp." />
+  <meta name="theme-color" content="#1C0F00" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-  <div class="logo-area">
-    <div class="logo-text">LO <span>QUIERO!</span></div>
+<!-- ==================== ANNOUNCEMENT BAR ==================== -->
+<div class="announce-bar" id="announceBar" style="display:none">
+  <div class="announce-scroll" id="announceScroll">
+    <!-- populated by JS -->
   </div>
-  <div class="header-search">
-    <!-- Search icon: Lucide "search" via CDN SVG -->
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+</div>
+
+<!-- ==================== HEADER ==================== -->
+<header class="site-header">
+  <!-- Logo -->
+  <a href="/" class="header-logo" aria-label="LO QUIERO! inicio">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="#E85002"/>
+      <path d="M8 11c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.21-1.79 4-4 4" stroke="#FFA500" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M16 11c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.21-1.79 4-4 4" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M7 15c0 5 3.5 9 9 10 5.5-1 9-5 9-10" stroke="white" stroke-width="2" stroke-linecap="round"/>
     </svg>
-    <input type="text" id="searchInput" placeholder="Buscar productos..." />
+    <span>LO <span class="excl">QUIERO!</span></span>
+  </a>
+
+  <!-- Search -->
+  <div class="header-search-wrap">
+    <span class="header-search-icon" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </span>
+    <input
+      type="search"
+      class="header-search"
+      id="searchInput"
+      placeholder="Buscar productos…"
+      autocomplete="off"
+      aria-label="Buscar productos"
+      aria-expanded="false"
+      aria-controls="searchDropdown"
+    />
+    <div class="search-dropdown" id="searchDropdown" role="listbox" aria-label="Resultados de búsqueda"></div>
   </div>
+
+  <!-- Actions -->
   <div class="header-actions">
-    <!-- Estrella favoritos -->
-    <button class="btn-icon" title="Favoritos" onclick="switchSidebarTab('favs')">
-      <svg class="icon-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-      <span class="badge" id="favBadge">0</span>
+    <!-- Favorites -->
+    <button class="btn-icon" id="btnFavs" aria-label="Favoritos" title="Favoritos">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span class="badge" id="favsBadge" style="display:none">0</span>
     </button>
-    <!-- Botón + agregar producto -->
-    <div tabindex="0" class="plusButton" onclick="openAdmin()" title="Agregar producto">
-      <svg class="plusIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
-        <g mask="url(#mask0_21_345)">
-          <path d="M13.75 23.75V16.25H6.25V13.75H13.75V6.25H16.25V13.75H23.75V16.25H16.25V23.75H13.75Z"></path>
-        </g>
-      </svg>
-    </div>
+    <!-- Cart -->
+    <button class="btn-icon" id="btnCart" aria-label="Carrito" title="Carrito">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="badge" id="cartBadge" style="display:none">0</span>
+    </button>
+    <!-- Admin lock -->
+    <a href="admin/" class="btn-icon" aria-label="Administrador" title="Modo admin">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </a>
   </div>
 </header>
 
-<!-- SIDEBAR TOGGLE -->
-<button class="sidebar-toggle collapsed-btn" id="sidebarToggle" onclick="toggleSidebar()" title="Mostrar panel">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="15 18 9 12 15 6"/>
-  </svg>
-</button>
+<!-- ==================== MOBILE SEARCH OVERLAY ==================== -->
+<div class="mobile-search-overlay" id="mobileSearchOverlay">
+  <div class="header-search-wrap">
+    <span class="header-search-icon" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </span>
+    <input
+      type="search"
+      class="header-search"
+      id="mobileSearchInput"
+      placeholder="Buscar productos…"
+      autocomplete="off"
+      aria-label="Buscar productos"
+    />
+    <div class="search-dropdown" id="mobileSearchDropdown" role="listbox" aria-label="Resultados de búsqueda"></div>
+  </div>
+  <span class="mobile-search-cancel" onclick="closeMobileSearch()">Cancelar</span>
+</div>
 
-<div class="main-layout">
+<!-- ==================== CATEGORY BAR ==================== -->
+<nav class="cat-bar" aria-label="Categorías">
+  <div class="cat-bar-inner" id="catBarInner">
+    <button class="cat-pill active" data-cat="all" onclick="filterCategory('all', this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Todo
+    </button>
+    <!-- More populated by JS -->
+  </div>
+</nav>
 
-  <!-- SIDEBAR (starts collapsed) -->
-  <aside class="sidebar collapsed" id="mainSidebar">
-    <div class="sidebar-tabs">
-      <button class="sidebar-tab active" id="tab-filters" onclick="switchSidebarTab('filters')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+<!-- ==================== PAGE LAYOUT ==================== -->
+<div class="page-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="mainSidebar" aria-label="Filtros">
+
+    <!-- Sidebar header with collapse toggle -->
+    <div class="sidebar-header">
+      <span class="sidebar-header-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
+        Panel
+      </span>
+      <button class="sidebar-collapse-btn" id="sidebarToggle" aria-label="Colapsar panel" title="Colapsar panel">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-content" id="sidebarContent">
+
+    <!-- Filters -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
         Filtros
-      </button>
-      <button class="sidebar-tab" id="tab-favs" onclick="switchSidebarTab('favs')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        Favoritos
-      </button>
-      <button class="sidebar-tab" id="tab-comments" onclick="switchSidebarTab('comments')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Comentarios
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label">Estado</div>
+        <div class="filter-chips">
+          <button class="filter-chip active" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">Todos</button>
+          <button class="filter-chip" data-filter="status" data-val="new" onclick="setFilter('status','new',this)">Nuevo</button>
+          <button class="filter-chip" data-filter="status" data-val="used" onclick="setFilter('status','used',this)">Usado</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label">Disponibilidad</div>
+        <div class="filter-chips">
+          <button class="filter-chip active" data-filter="stock" data-val="all" onclick="setFilter('stock','all',this)">Todos</button>
+          <button class="filter-chip" data-filter="stock" data-val="in" onclick="setFilter('stock','in',this)">En stock</button>
+          <button class="filter-chip" data-filter="stock" data-val="out" onclick="setFilter('stock','out',this)">Sin stock</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label">Precio</div>
+        <div class="price-inputs">
+          <input type="number" class="price-input" id="priceMin" placeholder="Mín $" min="0" oninput="applyFilters()" aria-label="Precio mínimo" />
+          <span class="price-sep">—</span>
+          <input type="number" class="price-input" id="priceMax" placeholder="Máx $" min="0" oninput="applyFilters()" aria-label="Precio máximo" />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label">Oferta</div>
+        <div class="filter-chips">
+          <button class="filter-chip" data-filter="offer" data-val="discount" onclick="setFilter('offer','discount',this)">Con descuento</button>
+        </div>
+      </div>
+
+      <button class="btn btn-outline" style="width:100%;margin-top:8px;font-size:0.82rem" onclick="clearFilters()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Limpiar filtros
       </button>
     </div>
 
-    <!-- Filters panel -->
-    <div class="sidebar-panel active" id="panel-filters">
-      <div class="filter-section">
-        <h4>Categoría</h4>
-        <div class="filter-tags" id="categoryFilters">
-          <button class="filter-tag active" data-cat="all"        onclick="filterByCategory(this)">Todos</button>
-          <button class="filter-tag"        data-cat="Tecnología"  onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            Tecnología
-          </button>
-          <button class="filter-tag"        data-cat="Hogar"       onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            Hogar
-          </button>
-          <button class="filter-tag"        data-cat="Cocina"      onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
-            Cocina
-          </button>
-          <button class="filter-tag"        data-cat="Baño"        onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-            Baño
-          </button>
-          <button class="filter-tag"        data-cat="Vestimenta"  onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
-            Vestimenta
-          </button>
-          <button class="filter-tag"        data-cat="Sábanas"     onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            Blamquería
-          </button>
-          <button class="filter-tag"        data-cat="Juguetes"    onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            Juguetes
-          </button>
-          <button class="filter-tag"        data-cat="Calzado"     onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 18v-6c0-1 .5-2 1.3-2.6L9 5l1 1-5 4h4l5.3-3.3a2 2 0 0 1 2.8.6l.4.6A2 2 0 0 1 17 10h3a2 2 0 0 1 2 2v1a5 5 0 0 1-5 5H4a2 2 0 0 1-2-2z"/></svg>
-            Calzado
-          </button>
-          <button class="filter-tag"        data-cat="Accesorios"  onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-            Accesorios
-          </button>
-          <button class="filter-tag"        data-cat="Otro"        onclick="filterByCategory(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-            Otro
-          </button>
-        </div>
+    <!-- Favorites mini list -->
+    <div class="sidebar-card" id="sidebarFavs" style="display:none">
+      <div class="sidebar-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Favoritos guardados
       </div>
-      <div class="filter-section">
-        <h4>Precio</h4>
-        <div class="price-row">
-          <input type="number" id="priceMin" placeholder="Mín $" min="0" oninput="applyFilters()" />
-          <span>—</span>
-          <input type="number" id="priceMax" placeholder="Máx $" min="0" oninput="applyFilters()" />
-        </div>
+      <div id="sidebarFavsList"></div>
+    </div>
+
+    <!-- Comments -->
+    <div class="sidebar-card">
+      <div class="sidebar-card-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        Comentarios privados
       </div>
-      <div class="filter-section">
-        <h4>Estado</h4>
-        <div class="filter-tags">
-          <button class="filter-tag active" data-status="all"   onclick="filterByStatus(this)">Todos</button>
-          <button class="filter-tag"        data-status="nuevo" onclick="filterByStatus(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            Nuevo
-          </button>
-          <button class="filter-tag"        data-status="usado" onclick="filterByStatus(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Usado
-          </button>
-        </div>
-      </div>
-      <div class="filter-section">
-        <h4>Disponibilidad</h4>
-        <div class="filter-tags">
-          <button class="filter-tag active" data-stock="all" onclick="filterByStock(this)">Todos</button>
-          <button class="filter-tag"        data-stock="1"   onclick="filterByStock(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="20 6 9 17 4 12"/></svg>
-            En stock
-          </button>
-          <button class="filter-tag"        data-stock="0"   onclick="filterByStock(this)">
-            <svg class="tag-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            Sin stock
-          </button>
-        </div>
+      <p style="font-size:0.8rem;color:var(--text-3);margin-bottom:12px;line-height:1.5">
+        ¿Tenés una consulta o sugerencia? Te respondo por WhatsApp.
+      </p>
+      <div class="comment-form">
+        <input type="text" class="form-input" id="commentName" placeholder="Tu nombre (opcional)" aria-label="Tu nombre" />
+        <textarea class="form-input form-textarea" id="commentText" placeholder="Tu mensaje…" aria-label="Mensaje"></textarea>
+        <button class="btn btn-primary" style="width:100%" onclick="sendComment()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Enviar
+        </button>
       </div>
     </div>
 
-    <!-- Favs panel -->
-    <div class="sidebar-panel" id="panel-favs">
-      <div class="fav-list" id="favList">
-        <div class="fav-empty" id="favEmpty">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <p>Todavía no guardaste favoritos.<br/>¡Tocá la estrella de un producto!</p>
-        </div>
-      </div>
-    </div>
+    </div><!-- /sidebar-content -->
 
-    <!-- Comments panel -->
-    <div class="sidebar-panel" id="panel-comments">
-      <div class="comment-section">
-        <div class="comment-intro">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="vertical-align:middle;margin-right:4px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          ¿Tenés alguna consulta, queja o sugerencia sobre la página? Escribinos y le llegará directamente a <strong>Carina</strong>.
-        </div>
-        <div class="comment-form">
-          <input type="text" id="commentName" placeholder="Tu nombre (opcional)" />
-          <textarea id="commentText" placeholder="Escribí tu mensaje acá..."></textarea>
-          <button class="btn-send" onclick="sendComment()">Enviar mensaje
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
-          <div class="comment-success" id="commentSuccess">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
-            ¡Mensaje enviado! Carina lo recibirá pronto.
-          </div>
-        </div>
-      </div>
+    <!-- Collapsed state: icon rail -->
+    <div class="sidebar-rail" id="sidebarRail">
+      <button class="sidebar-rail-btn" onclick="expandSidebar()" title="Filtros" aria-label="Mostrar filtros">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
+      </button>
+      <button class="sidebar-rail-btn" onclick="expandSidebar()" title="Favoritos guardados" aria-label="Mostrar favoritos">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <button class="sidebar-rail-btn" onclick="expandSidebar()" title="Comentarios privados" aria-label="Mostrar comentarios">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      </button>
+      <button class="sidebar-rail-btn sidebar-rail-expand" onclick="expandSidebar()" title="Expandir panel" aria-label="Expandir panel">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
   </aside>
 
-  <!-- CATALOG AREA -->
-  <main class="catalog-area" id="catalogArea">
+  <!-- ==================== CATALOG MAIN ==================== -->
+  <main class="catalog-main" id="catalogMain">
 
-    <!-- Hero banner (imagen/video de fondo) -->
-    <div class="hero-banner">
-      <!--
-        Para usar imagen: agregá style="background-image:url('assets/images/banner.jpg')"
-        Para usar video: descomentá el bloque video de abajo
-      -->
-      <!--
-      <video class="hero-video" autoplay muted loop playsinline>
-        <source src="assets/videos/banner.mp4" type="video/mp4" />
-      </video>
-      -->
-      <div class="hero-overlay"></div>
-      <div class="hero-text">
-        <h2>¡TODO LO QUE <span>QUERÉS</span><br/>EN UN LUGAR!</h2>
-        <p>Tecnología · Hogar · Moda · Cocina y mucho más</p>
+    <!-- Hero Carousel -->
+    <section class="hero-carousel" id="heroCarousel" aria-label="Novedades" style="display:none">
+      <div class="carousel-track" id="carouselTrack"></div>
+      <button class="carousel-btn prev" id="carouselPrev" aria-label="Anterior">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="carousel-btn next" id="carouselNext" aria-label="Siguiente">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </section>
+
+    <!-- Sections (populated dynamically) -->
+    <div id="sectionsContainer"></div>
+
+    <!-- All products fallback grid -->
+    <section id="allProductsSection">
+      <div class="section-header">
+        <h2 class="section-title" id="gridTitle">Todos los productos</h2>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:0.8rem;color:var(--text-3)" id="resultCount"></span>
+          <select id="sortSelect" onchange="applyFilters()" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font-body);font-size:0.82rem;color:var(--text-1);background:var(--surface);outline:none;cursor:pointer" aria-label="Ordenar">
+            <option value="default">Destacados</option>
+            <option value="price-asc">Menor precio</option>
+            <option value="price-desc">Mayor precio</option>
+            <option value="name-asc">A — Z</option>
+            <option value="new">Más nuevos</option>
+          </select>
+        </div>
+      </div>
+      <div class="products-grid" id="productsGrid">
+        <!-- Skeleton placeholders -->
+        <div class="product-card skeleton" style="height:320px"></div>
+        <div class="product-card skeleton" style="height:320px"></div>
+        <div class="product-card skeleton" style="height:320px"></div>
+        <div class="product-card skeleton" style="height:320px"></div>
+        <div class="product-card skeleton" style="height:320px"></div>
+        <div class="product-card skeleton" style="height:320px"></div>
+      </div>
+      <!-- Empty state -->
+      <div id="emptyState" style="display:none;text-align:center;padding:64px 24px">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--brown-200)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <p style="font-size:1.1rem;font-weight:700;color:var(--text-2);margin-bottom:8px">Sin resultados</p>
+        <p style="font-size:0.88rem;color:var(--text-3)">Probá con otros filtros o términos de búsqueda</p>
+        <button class="btn btn-outline" style="margin-top:16px" onclick="clearFilters()">Limpiar filtros</button>
+      </div>
+    </section>
+
+    <!-- Comment section (bottom) -->
+    <div class="comment-section" id="commentSectionBottom" style="display:none">
+      <h3 class="section-title" style="margin-bottom:16px">¿Consultas? Te escucho</h3>
+      <p class="comment-intro">Tu mensaje llega directo a WhatsApp. Respondo a la brevedad.</p>
+      <div class="comment-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <input type="text" class="form-input" id="commentNameBottom" placeholder="Tu nombre (opcional)" />
+          <input type="tel" class="form-input" id="commentPhoneBottom" placeholder="Tu teléfono (opcional)" />
+        </div>
+        <textarea class="form-input form-textarea" style="height:120px" id="commentTextBottom" placeholder="Escribí tu consulta o sugerencia…"></textarea>
+        <button class="btn btn-wa" onclick="sendCommentBottom()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Enviar por WhatsApp
+        </button>
       </div>
     </div>
 
-    <!-- SECCIONES ESPECIALES: Nuevos, Recién vistos, Recomendados -->
-    <div id="specialSections"></div>
-
-    <!-- CARRUSELES POR CATEGORÍA -->
-    <div id="carouselsSection"></div>
-
-    <!-- Sort row + All Products -->
-    <div id="allProductsSection">
-      <div class="filters-row">
-        <span style="font-size:0.85rem; font-weight:700; color:var(--gray)" id="resultCount">Cargando...</span>
-        <select class="sort-select" id="sortSelect" onchange="applyFilters()">
-          <option value="default">Ordenar: Destacados</option>
-          <option value="price-asc">Precio: menor a mayor</option>
-          <option value="price-desc">Precio: mayor a menor</option>
-          <option value="name-asc">Nombre A–Z</option>
-        </select>
-      </div>
-      <div class="section-title-row">
-        <h3 class="section-title">Todos los productos</h3>
-      </div>
-      <div class="products-grid" id="productsGrid"></div>
-    </div>
   </main>
 </div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">LO <span>QUIERO!</span></div>
-  <div class="footer-links">
-    <a href="https://wa.me/5493445440326" class="footer-link wa" target="_blank">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      WhatsApp
-    </a>
-    <a href="https://instagram.com/loquiero" class="footer-link ig" target="_blank">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-      Instagram
+<!-- ==================== FOOTER ==================== -->
+<footer class="site-footer">
+  <div class="lq-accent-line" style="margin-bottom:48px"></div>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">LO QUIERO!</div>
+      <p class="footer-desc">Tu tienda de confianza. Tecnología, hogar, cocina, blanquería y mucho más. Encargá por WhatsApp sin complicaciones.</p>
+      <div class="footer-social">
+        <a href="https://wa.me/5493445440326" class="footer-social-link" target="_blank" rel="noopener" aria-label="WhatsApp">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+        <a href="https://instagram.com/loquiero.tienda" class="footer-social-link" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Categorías</div>
+      <div id="footerCats"></div>
+    </div>
+    <div>
+      <div class="footer-col-title">Contacto</div>
+      <a href="https://wa.me/5493445440326" class="footer-link" target="_blank" rel="noopener">
+        WhatsApp: +54 9 3445 440326
+      </a>
+      <a href="https://instagram.com/loquiero.tienda" class="footer-link" target="_blank" rel="noopener">
+        Instagram: @loquiero.tienda
+      </a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 LO QUIERO! Todos los derechos reservados.</span>
+    <a href="https://wa.me/5493445440326" class="footer-wa-btn" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Contactar ahora
     </a>
   </div>
-  <div class="footer-copy">© 2025 LO QUIERO! — Todos los derechos reservados</div>
 </footer>
 
-<!-- ADMIN MODAL -->
-<div class="modal-overlay" id="adminModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" style="vertical-align:middle;margin-right:6px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        AGREGAR PRODUCTO
-      </h3>
-      <button class="modal-close" onclick="closeAdmin()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+<!-- ==================== MOBILE BOTTOM NAV ==================== -->
+<nav class="mobile-nav" aria-label="Navegación principal">
+  <button class="mobile-nav-item active" onclick="mobileNav('home',this)" aria-label="Inicio">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Inicio</span>
+  </button>
+  <button class="mobile-nav-item" onclick="mobileNav('search',this)" aria-label="Buscar">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <span>Buscar</span>
+  </button>
+  <button class="mobile-nav-item" onclick="mobileNav('favs',this)" aria-label="Favoritos" id="mobileNavFavs">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span>Guardados</span>
+  </button>
+  <button class="mobile-nav-item" onclick="openCartDrawer()" aria-label="Carrito" id="mobileNavCart" style="position:relative">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>Carrito</span>
+    <span class="badge" id="mobileCartBadge" style="display:none;top:-2px;right:8px">0</span>
+  </button>
+  <button class="mobile-nav-item" onclick="openFiltersMobile()" aria-label="Filtros">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
+    <span>Filtros</span>
+  </button>
+</nav>
+
+<!-- ==================== CART DRAWER ==================== -->
+<div class="drawer-overlay" id="cartOverlay" onclick="closeCartDrawer()"></div>
+<aside class="cart-drawer" id="cartDrawer" aria-label="Carrito de compras">
+  <div class="cart-header">
+    <h2 class="cart-title">Tu carrito</h2>
+    <button class="btn-icon" onclick="closeCartDrawer()" aria-label="Cerrar carrito">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cart-body" id="cartBody"></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-discount-row">
+      <input type="text" class="cart-discount-input" id="discountInput" placeholder="CÓDIGO DE DESCUENTO" maxlength="20" />
+      <button class="btn btn-outline" style="height:40px;padding:0 16px;font-size:0.82rem" onclick="applyDiscountCode()">Aplicar</button>
     </div>
+    <div class="cart-totals" id="cartTotals"></div>
+    <button class="btn btn-wa" style="width:100%" onclick="checkoutWa()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Encargar por WhatsApp
+    </button>
+  </div>
+</aside>
 
-    <!-- Auth screen -->
-    <div id="authScreen" class="admin-auth">
-      <h4>Acceso exclusivo para Carina ✨</h4>
-      <input type="password" id="adminPass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')checkAuth()" />
-      <div class="auth-error" id="authError">Contraseña incorrecta. Intentá de nuevo.</div>
-      <button class="btn-submit-product" onclick="checkAuth()">Entrar →</button>
-    </div>
+<!-- ==================== FAVS DRAWER ==================== -->
+<aside class="favs-drawer" id="favsDrawer" aria-label="Productos guardados">
+  <div class="cart-header">
+    <h2 class="cart-title">Guardados</h2>
+    <button class="btn-icon" onclick="closeFavsDrawer()" aria-label="Cerrar favoritos">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cart-body" id="favsBody"></div>
+</aside>
 
-    <!-- Admin form -->
-    <div id="adminForm" style="display:none">
-      <div style="display:flex;gap:0.5rem;margin-bottom:1.2rem">
-        <button class="filter-tag active" id="adminTab1" onclick="switchAdminTab(1)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nuevo producto
-        </button>
-        <button class="filter-tag" id="adminTab2" onclick="switchAdminTab(2)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          Mis productos
-        </button>
-      </div>
-
-      <div id="adminAddPanel">
-        <!-- Fotos con previsualización y botón borrar -->
-        <div class="form-group">
-          <label>Fotos del producto</label>
-          <div class="upload-area" id="uploadArea">
-            <input type="file" id="photoUpload" accept="image/*" multiple onchange="previewImages()" />
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32" style="color:var(--orange-light)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <p>Tocá para subir una o varias fotos</p>
-            <span class="upload-hint">JPG, PNG, WEBP</span>
-          </div>
-          <div class="preview-imgs" id="previewImgs"></div>
-        </div>
-
-        <div class="form-group">
-          <label>Nombre del producto *</label>
-          <input type="text" id="prodName" placeholder="Ej: Auriculares Bluetooth" />
-        </div>
-        <div class="form-group">
-          <label>Descripción</label>
-          <textarea id="prodDesc" placeholder="Describí el producto..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Categoría *</label>
-          <div class="tags-select" id="tagsPicker">
-            <button class="tag-option" onclick="toggleTag(this,'Tecnología')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-              Tecnología
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Hogar')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              Hogar
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Cocina')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
-              Cocina
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Baño')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-              Baño
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Vestimenta')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
-              Vestimenta
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Sábanas')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              Sábanas
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Juguetes')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-              Juguetes
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Calzado')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><path d="M2 18v-6c0-1 .5-2 1.3-2.6L9 5l1 1-5 4h4l5.3-3.3a2 2 0 0 1 2.8.6l.4.6A2 2 0 0 1 17 10h3a2 2 0 0 1 2 2v1a5 5 0 0 1-5 5H4a2 2 0 0 1-2-2z"/></svg>
-              Calzado
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Accesorios')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-              Accesorios
-            </button>
-            <button class="tag-option" onclick="toggleTag(this,'Otro')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-              Otro
-            </button>
-          </div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-          <div class="form-group">
-            <label>Precio ($) *</label>
-            <input type="number" id="prodPrice" placeholder="0.00" min="0" />
-          </div>
-          <div class="form-group">
-            <label>Estado <span style="font-weight:400;color:var(--gray);font-size:0.75rem">(opcional)</span></label>
-            <div class="toggle-row" style="margin-top:0.5rem">
-              <label class="toggle-opt"><input type="checkbox" id="chkNuevo" value="nuevo" /> Nuevo</label>
-              <label class="toggle-opt"><input type="checkbox" id="chkUsado" value="usado" /> Usado</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Disponibilidad</label>
-          <div class="toggle-row">
-            <label class="toggle-opt">
-              <input type="radio" name="prodStock" value="1" checked />
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
-              En stock
-            </label>
-            <label class="toggle-opt">
-              <input type="radio" name="prodStock" value="0" />
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              Sin stock
-            </label>
-          </div>
-        </div>
-        <button class="btn-submit-product" onclick="addProduct()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          PUBLICAR PRODUCTO
-        </button>
-      </div>
-
-      <div id="adminManagePanel" style="display:none">
-        <div class="manage-list" id="manageList"></div>
-      </div>
-    </div>
+<!-- ==================== PRODUCT DETAIL MODAL ==================== -->
+<div class="modal-overlay" id="productModal" onclick="closeProductModal(event)" role="dialog" aria-modal="true" aria-label="Detalle del producto">
+  <div class="modal-sheet" id="productModalSheet">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeProductModal()" aria-label="Cerrar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div id="productModalContent"></div>
   </div>
 </div>
 
-<!-- PRODUCT DETAIL MODAL -->
-<div class="modal-overlay" id="detailModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>DETALLE</h3>
-      <button class="modal-close" onclick="closeDetail()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+<!-- ==================== MOBILE FILTERS SHEET ==================== -->
+<div class="modal-overlay" id="filtersModal" onclick="closeFiltersMobile(event)" style="z-index:350">
+  <div class="modal-sheet" style="max-width:100%;padding:24px">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h3 style="font-family:var(--font-display);font-weight:800">Filtros</h3>
+      <button class="btn-icon" onclick="closeFiltersMobile()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div id="detailContent"></div>
+    <div id="mobileFiltersContent"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="closeFiltersMobile()">Ver resultados</button>
   </div>
 </div>
 
-<script src="script.js"></script>
+<!-- ==================== TOAST CONTAINER ==================== -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!-- ==================== MAIN SCRIPT ==================== -->
+<script type="module">
+import { Cart, Favs, orderSingleProduct } from './js/store.js';
+
+// ---- Config (replace with your Supabase project) ----
+const SUPABASE_URL     = 'https://unkewfarpionedanpmyq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVua2V3ZmFycGlvbmVkYW5wbXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMzE0NDcsImV4cCI6MjA5NjgwNzQ0N30.14lPbqKTAx4DPKFQ7NDb8YWk5_gCaVfI02A_8NyOnuk';
+const WA_NUMBER = '5493445440326';
+
+let sb = null;
+const isConfigured = !SUPABASE_URL.includes('TU_PROYECTO') && !SUPABASE_ANON_KEY.includes('TU_ANON_KEY');
+if (isConfigured) {
+  try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+  catch(e) { console.warn('Error al inicializar Supabase, usando modo demo.', e); sb = null; }
+} else {
+  console.info('%cLO QUIERO! — Modo demo activo (Supabase no configurado)', 'color:#E85002;font-weight:bold');
+}
+
+// ---- State ----
+let allProducts   = [];
+let categories    = [];
+let activeFilters = { category: 'all', status: 'all', stock: 'all', offer: null, q: '' };
+let activeDiscount = null;
+let carouselIdx   = 0;
+let carouselTimer;
+
+// =============================================
+// INIT
+// =============================================
+async function init() {
+  updateBadges();
+  Cart.onChange(updateBadges);
+  Favs.onChange(updateBadges);
+
+  await Promise.all([
+    loadCategories(),
+    loadCarousels(),
+    loadAnnouncements(),
+    loadProducts(),
+    loadSections(),
+  ]);
+
+  setupSearch();
+  setupSidebar();
+
+  // Show comment section at bottom on desktop
+  if (window.innerWidth >= 769) {
+    document.getElementById('commentSectionBottom').style.display = 'block';
+  }
+}
+
+// =============================================
+// DATA LOADERS
+// =============================================
+async function loadCategories() {
+  let data;
+  if (sb) {
+    try {
+      const res = await sb.from('categories').select('*').eq('active', true).order('sort_order');
+      data = res.data;
+    } catch(e) { console.error('Error cargando categorías:', e); }
+  }
+  if (!data || !data.length) {
+    // Demo data / fallback
+    data = [
+      { id:'1', name:'Tecnología', slug:'tecnologia', icon:'cpu' },
+      { id:'2', name:'Hogar', slug:'hogar', icon:'home' },
+      { id:'3', name:'Cocina', slug:'cocina', icon:'utensils' },
+      { id:'4', name:'Blanquería', slug:'blanqueria', icon:'layers' },
+      { id:'5', name:'Vestimenta', slug:'vestimenta', icon:'shirt' },
+    ];
+  }
+  categories = data;
+  renderCategoryBar();
+  renderFooterCats();
+}
+
+async function loadProducts() {
+  let data;
+  if (sb) {
+    try {
+      const res = await sb.from('products')
+        .select('*, categories(name,slug)')
+        .eq('is_active', true)
+        .order('is_featured', { ascending: false })
+        .order('created_at', { ascending: false });
+      data = res.data;
+    } catch(e) { console.error('Error cargando productos:', e); }
+  }
+  if (!data) {
+    // Demo products / fallback
+    data = Array.from({length: 12}, (_, i) => ({
+      id: String(i+1),
+      name: ['Auriculares Bluetooth Pro','Sartén Antiadherente 28cm','Juego de Sábanas 2P','Smart TV 43" LED','Juego de Bowls Ceramica','Zapatillas Running','Perfumador Difusor Aromas','Cafetera Express','Almohada Memory Foam','Toalla Baño Extra Suave','Reloj Pared Minimalista','Set Portarretratos'][i],
+      price: [18500,5200,7800,85000,3400,22000,4500,12000,6700,2900,3800,5600][i],
+      compare_price: [22000, null, 9500, null, null, 26000, null, null, null, null, null, null][i],
+      discount_pct: [15, 0, 18, 0, 0, 12, 0, 0, 0, 0, 0, 0][i],
+      images: [],
+      is_new: i < 4,
+      is_featured: i < 2,
+      stock: i === 3 ? 0 : 5,
+      categories: categories[i % Math.max(categories.length,1)] || { name:'General', slug:'general' },
+      tags: []
+    }));
+  }
+  allProducts = data;
+  applyFilters();
+}
+
+async function loadCarousels() {
+  let data;
+  if (sb) {
+    try {
+      const res = await sb.from('carousels').select('*').eq('active', true).order('sort_order');
+      data = res.data;
+    } catch(e) { console.error('Error cargando carruseles:', e); }
+  }
+  if (!data) {
+    data = [
+      { id:'1', title:'¡Todo lo que querés!', subtitle:'Tecnología, hogar, cocina y mucho más', bg_color:'#E85002' },
+      { id:'2', title:'Nuevos productos', subtitle:'Blanquería y textiles premium', bg_color:'#2E1A00' },
+    ];
+  }
+  if (data?.length) {
+    renderCarousel(data);
+  }
+}
+
+async function loadAnnouncements() {
+  let data;
+  if (sb) {
+    try {
+      const res = await sb.from('announcements').select('*').eq('active', true).limit(3);
+      data = res.data;
+    } catch(e) { console.error('Error cargando anuncios:', e); }
+  }
+  if (!data) {
+    data = [{ text:'🔥 Nuevos productos cada semana · Encargá por WhatsApp al instante · Envíos a todo el país' }];
+  }
+  if (data?.length) {
+    const bar = document.getElementById('announceBar');
+    const scroll = document.getElementById('announceScroll');
+    const texts = data.map(a => a.text).join('  ·  ');
+    scroll.innerHTML = `<span>${texts}</span><span>${texts}</span>`;
+    bar.style.display = 'flex';
+  }
+}
+
+async function loadSections() {
+  // Sections are rendered dynamically — skip for demo
+}
+
+// =============================================
+// RENDER CATEGORY BAR
+// =============================================
+function renderCategoryBar() {
+  const inner = document.getElementById('catBarInner');
+  const catIcons = { cpu:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>', home:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>', utensils:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/></svg>', layers:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>', shirt:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>', droplets:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/></svg>' };
+  const pills = categories.map(c => `
+    <button class="cat-pill" data-cat="${c.slug}" onclick="filterCategory('${c.slug}', this)">
+      ${catIcons[c.icon] || ''}
+      ${c.name}
+    </button>
+  `).join('');
+  inner.innerHTML = inner.children[0].outerHTML + pills;
+}
+
+function renderFooterCats() {
+  const el = document.getElementById('footerCats');
+  el.innerHTML = categories.map(c => `<a href="#" class="footer-link" onclick="filterCategory('${c.slug}');return false">${c.name}</a>`).join('');
+}
+
+// =============================================
+// CAROUSEL
+// =============================================
+function renderCarousel(slides) {
+  const carousel = document.getElementById('heroCarousel');
+  const track    = document.getElementById('carouselTrack');
+  const dots     = document.getElementById('carouselDots');
+  carousel.style.display = 'block';
+
+  track.innerHTML = slides.map((s, i) => `
+    <div class="carousel-slide" style="background:${s.bg_color||'#1C0F00'}">
+      ${s.image_url ? `<img src="${s.image_url}" alt="${s.title}" loading="lazy" />` : ''}
+      <div class="carousel-slide-content">
+        <h2>${s.title}</h2>
+        ${s.subtitle ? `<p>${s.subtitle}</p>` : ''}
+        ${s.link_value ? `<button class="btn btn-primary" onclick="event.stopPropagation()">Ver ahora</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  dots.innerHTML = slides.map((_, i) => `<button class="carousel-dot ${i===0?'active':''}" onclick="goToSlide(${i})" aria-label="Ir a slide ${i+1}"></button>`).join('');
+
+  document.getElementById('carouselPrev').onclick = () => goToSlide((carouselIdx - 1 + slides.length) % slides.length);
+  document.getElementById('carouselNext').onclick = () => goToSlide((carouselIdx + 1) % slides.length);
+
+  startCarouselTimer(slides.length);
+}
+
+window.goToSlide = function(idx) {
+  carouselIdx = idx;
+  document.getElementById('carouselTrack').style.transform = `translateX(-${idx * 100}%)`;
+  document.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+};
+
+function startCarouselTimer(len) {
+  clearInterval(carouselTimer);
+  if (len > 1) carouselTimer = setInterval(() => goToSlide((carouselIdx + 1) % len), 5000);
+}
+
+// =============================================
+// PRODUCT RENDERING
+// =============================================
+function renderProductCard(p) {
+  const isFav   = Favs.has(p.id);
+  const noStock = p.stock === 0;
+  const priceFmt = n => '$' + Number(n).toLocaleString('es-AR');
+  const img = p.images?.[0]
+    ? `<img class="card-img" src="${p.images[0]}" alt="${p.name}" loading="lazy" />`
+    : `<div class="card-img-placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+  const badge = noStock
+    ? `<span class="card-badge badge-nostock">Sin stock</span>`
+    : p.is_new
+      ? `<span class="card-badge badge-new">Nuevo</span>`
+      : p.discount_pct > 0
+        ? `<span class="card-badge badge-off">-${p.discount_pct}%</span>`
+        : '';
+  const comparePrice = p.compare_price ? `<span class="card-compare">${priceFmt(p.compare_price)}</span>` : '';
+  const discountBadge = p.discount_pct > 0 ? `<span class="card-discount">-${p.discount_pct}%</span>` : '';
+  const catName = p.categories?.name || '';
+
+  return `
+    <article class="product-card" onclick="openProduct('${p.id}')" role="button" tabindex="0" aria-label="${p.name}" onkeydown="if(event.key==='Enter')openProduct('${p.id}')">
+      <div class="card-img-wrap">
+        ${img}
+        ${badge}
+        <button class="card-fav ${isFav ? 'saved' : ''}" onclick="toggleFav(event,'${p.id}')" aria-label="${isFav ? 'Quitar de favoritos' : 'Guardar en favoritos'}" aria-pressed="${isFav}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        ${catName ? `<div class="card-cat">${catName}</div>` : ''}
+        <div class="card-name">${p.name}</div>
+        <div class="card-prices">
+          <span class="card-price">${priceFmt(p.price)}</span>
+          ${comparePrice}
+          ${discountBadge}
+        </div>
+        <div class="card-actions">
+          <button class="card-btn-cart" onclick="addToCart(event,'${p.id}')" ${noStock ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''} aria-label="Agregar al carrito">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            ${noStock ? 'Sin stock' : 'Al carrito'}
+          </button>
+        </div>
+      </div>
+    </article>`;
+}
+
+// =============================================
+// FILTERS
+// =============================================
+window.filterCategory = function(slug, btn) {
+  activeFilters.category = slug;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else document.querySelector(`.cat-pill[data-cat="${slug}"]`)?.classList.add('active');
+  applyFilters();
+  document.getElementById('gridTitle').textContent = slug === 'all' ? 'Todos los productos' : (categories.find(c=>c.slug===slug)?.name || 'Productos');
+};
+
+window.setFilter = function(type, val, btn) {
+  activeFilters[type] = val;
+  document.querySelectorAll(`[data-filter="${type}"]`).forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+  applyFilters();
+};
+
+window.clearFilters = function() {
+  activeFilters = { category: 'all', status: 'all', stock: 'all', offer: null, q: '' };
+  document.getElementById('searchInput').value = '';
+  document.querySelectorAll('.filter-chip').forEach(c => { c.classList.remove('active'); if (c.dataset.val === 'all') c.classList.add('active'); });
+  document.querySelectorAll('.cat-pill').forEach(p => { p.classList.remove('active'); if (p.dataset.cat === 'all') p.classList.add('active'); });
+  document.getElementById('priceMin').value = '';
+  document.getElementById('priceMax').value = '';
+  document.getElementById('gridTitle').textContent = 'Todos los productos';
+  applyFilters();
+};
+
+window.applyFilters = function() {
+  const sort = document.getElementById('sortSelect').value;
+  const minP = parseFloat(document.getElementById('priceMin').value) || 0;
+  const maxP = parseFloat(document.getElementById('priceMax').value) || Infinity;
+
+  let filtered = allProducts.filter(p => {
+    if (activeFilters.category !== 'all' && p.categories?.slug !== activeFilters.category) return false;
+    if (activeFilters.status === 'new' && !p.is_new) return false;
+    if (activeFilters.status === 'used' && p.is_new) return false;
+    if (activeFilters.stock === 'in' && p.stock === 0) return false;
+    if (activeFilters.stock === 'out' && p.stock !== 0) return false;
+    if (activeFilters.offer === 'discount' && !p.discount_pct) return false;
+    if (p.price < minP || p.price > maxP) return false;
+    if (activeFilters.q) {
+      const q = activeFilters.q.toLowerCase();
+      if (!p.name.toLowerCase().includes(q) && !(p.description||'').toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (sort === 'price-asc')  filtered.sort((a,b) => a.price - b.price);
+  if (sort === 'price-desc') filtered.sort((a,b) => b.price - a.price);
+  if (sort === 'name-asc')   filtered.sort((a,b) => a.name.localeCompare(b.name));
+  if (sort === 'new')        filtered.sort((a,b) => b.is_new - a.is_new);
+
+  const grid = document.getElementById('productsGrid');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('resultCount');
+
+  if (!filtered.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    count.textContent = '';
+  } else {
+    empty.style.display = 'none';
+    grid.innerHTML = filtered.map(renderProductCard).join('');
+    count.textContent = `${filtered.length} producto${filtered.length !== 1 ? 's' : ''}`;
+  }
+};
+
+// =============================================
+// SEARCH
+// =============================================
+function setupSearch() {
+  setupSearchInput('searchInput', 'searchDropdown');
+  setupSearchInput('mobileSearchInput', 'mobileSearchDropdown');
+}
+
+function setupSearchInput(inputId, dropdownId) {
+  const input    = document.getElementById(inputId);
+  const dropdown = document.getElementById(dropdownId);
+  if (!input || !dropdown) return;
+  let timer;
+
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = input.value.trim();
+    activeFilters.q = q;
+    // Sync the other input
+    const other = inputId === 'searchInput' ? document.getElementById('mobileSearchInput') : document.getElementById('searchInput');
+    if (other && other.value !== q) other.value = q;
+
+    if (!q) { dropdown.classList.remove('open'); applyFilters(); return; }
+    timer = setTimeout(() => {
+      const results = allProducts.filter(p =>
+        p.name.toLowerCase().includes(q.toLowerCase()) ||
+        (p.description||'').toLowerCase().includes(q.toLowerCase())
+      ).slice(0, 7);
+      renderSearchDropdown(results, q, dropdownId);
+      applyFilters();
+    }, 200);
+  });
+
+  document.addEventListener('click', e => {
+    if (!input.closest('.header-search-wrap')?.contains(e.target)) dropdown.classList.remove('open');
+  });
+}
+
+window.openMobileSearch = function() {
+  document.getElementById('mobileSearchOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('mobileSearchInput').focus(), 300);
+};
+window.closeMobileSearch = function() {
+  document.getElementById('mobileSearchOverlay').classList.remove('open');
+  document.getElementById('mobileSearchDropdown').classList.remove('open');
+};
+
+function renderSearchDropdown(results, q, dropdownId = 'searchDropdown') {
+  const dropdown = document.getElementById(dropdownId);
+  if (!results.length) { dropdown.classList.remove('open'); return; }
+  dropdown.innerHTML = results.map(p => {
+    const img = p.images?.[0] ? `<img class="search-result-img" src="${p.images[0]}" alt="${p.name}" />` : `<div class="search-result-img" style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brown-200)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg></div>`;
+    const highlighted = p.name.replace(new RegExp(q, 'gi'), m => `<mark style="background:var(--brand-amber-pale);color:var(--accent)">${m}</mark>`);
+    return `<div class="search-result-item" onclick="openProduct('${p.id}');document.getElementById('${dropdownId}').classList.remove('open');closeMobileSearch()" role="option">
+      ${img}
+      <div class="search-result-info"><p>${highlighted}</p><span>$${Number(p.price).toLocaleString('es-AR')}</span></div>
+    </div>`;
+  }).join('');
+  dropdown.classList.add('open');
+}
+
+// =============================================
+// PRODUCT DETAIL MODAL
+// =============================================
+window.openProduct = function(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  const modal   = document.getElementById('productModal');
+  const content = document.getElementById('productModalContent');
+  const noStock = p.stock === 0;
+  const isFav   = Favs.has(p.id);
+  const priceFmt = n => '$' + Number(n).toLocaleString('es-AR');
+
+  const images = p.images?.length ? p.images : [];
+  const gallery = images.length
+    ? `<div class="detail-gallery" id="detailGallery"><img id="detailMainImg" src="${images[0]}" alt="${p.name}" /></div>
+       ${images.length > 1 ? `<div class="gallery-thumbs">${images.map((src,i) => `<img class="gallery-thumb ${i===0?'active':''}" src="${src}" onclick="setDetailImg('${src}',this)" alt="Imagen ${i+1}" />`).join('')}</div>` : ''}`
+    : `<div class="detail-gallery" style="display:flex;align-items:center;justify-content:center;"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--brown-200)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+
+  // Variants
+  const variants = p.variants || [];
+  const variantsHtml = variants.map(v => `
+    <div class="variant-group">
+      <div class="variant-label">${v.name}</div>
+      <div class="variant-options" data-variant="${v.name}">
+        ${v.options.map((opt, i) => {
+          const isColor = v.name.toLowerCase() === 'color';
+          return isColor
+            ? `<button class="variant-option color-opt ${i===0?'selected':''}" style="background:${opt}" data-val="${opt}" onclick="selectVariant(this,'${v.name}')" title="${opt}" aria-label="${opt}"></button>`
+            : `<button class="variant-option ${i===0?'selected':''}" data-val="${opt}" onclick="selectVariant(this,'${v.name}')">${opt}</button>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+
+  const compareHtml = p.compare_price ? `<span style="font-size:1rem;color:var(--text-3);text-decoration:line-through;font-weight:600">$${Number(p.compare_price).toLocaleString('es-AR')}</span>` : '';
+
+  content.innerHTML = `
+    ${gallery}
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+      <div>
+        ${p.categories?.name ? `<div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:var(--accent);margin-bottom:4px">${p.categories.name}</div>` : ''}
+        <h2 style="font-family:var(--font-display);font-size:1.35rem;font-weight:800;line-height:1.2;color:var(--text-1)">${p.name}</h2>
+      </div>
+      <button class="card-fav ${isFav?'saved':''}" onclick="toggleFav(event,'${p.id}')" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--brown-100);display:flex;align-items:center;justify-content:center" aria-label="Favorito">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="${isFav?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+    </div>
+
+    ${p.description ? `<p style="font-size:0.9rem;color:var(--text-2);line-height:1.65;margin-bottom:16px">${p.description}</p>` : ''}
+
+    ${variantsHtml}
+
+    <div style="display:flex;align-items:center;gap:16px;margin:16px 0">
+      <div style="display:flex;flex-direction:column">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--accent)">${priceFmt(p.price)}</span>
+          ${compareHtml}
+        </div>
+        ${p.discount_pct > 0 ? `<span style="font-size:0.78rem;font-weight:800;color:white;background:var(--accent);padding:2px 8px;border-radius:var(--r-full);width:fit-content">${p.discount_pct}% OFF</span>` : ''}
+      </div>
+      <div style="margin-left:auto">
+        <div class="qty-selector" id="detailQtySelector">
+          <button class="qty-btn" onclick="changeDetailQty(-1)" aria-label="Restar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <span class="qty-value" id="detailQty">1</span>
+          <button class="qty-btn" onclick="changeDetailQty(1)" aria-label="Sumar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    ${noStock
+      ? `<button class="btn" style="width:100%;background:var(--brown-100);color:var(--text-3);cursor:not-allowed;height:50px;border-radius:var(--r-lg)" disabled>Sin stock por el momento</button>`
+      : `<div style="display:flex;gap:10px">
+          <button class="btn btn-outline" style="flex:1;height:50px" onclick="addToCartFromModal('${p.id}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Al carrito
+          </button>
+          <button class="btn btn-wa" style="flex:2;height:50px" onclick="orderFromModal('${p.id}')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Encargar
+          </button>
+        </div>`
+    }`;
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeProductModal = function(e) {
+  if (e && e.target !== document.getElementById('productModal')) return;
+  document.getElementById('productModal').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+window.setDetailImg = function(src, thumb) {
+  document.getElementById('detailMainImg').src = src;
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+};
+
+let detailQty = 1;
+window.changeDetailQty = function(delta) {
+  detailQty = Math.max(1, detailQty + delta);
+  document.getElementById('detailQty').textContent = detailQty;
+};
+
+window.selectVariant = function(btn, group) {
+  btn.closest('.variant-options').querySelectorAll('.variant-option').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+};
+
+function getSelectedVariants() {
+  const variants = {};
+  document.querySelectorAll('.variant-options').forEach(group => {
+    const selected = group.querySelector('.variant-option.selected');
+    if (selected) variants[group.dataset.variant] = selected.dataset.val;
+  });
+  return Object.keys(variants).length ? variants : null;
+}
+
+window.addToCartFromModal = function(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  Cart.add(p, detailQty, getSelectedVariants());
+  showToast('Agregado al carrito', 'success');
+};
+
+window.orderFromModal = function(id) {
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  orderSingleProduct(p, detailQty, getSelectedVariants());
+};
+
+// =============================================
+// CART
+// =============================================
+window.addToCart = function(e, id) {
+  e.stopPropagation();
+  const p = allProducts.find(x => x.id === id);
+  if (!p || p.stock === 0) return;
+  Cart.add(p, 1);
+  showToast(`${p.name} agregado al carrito`, 'success');
+};
+
+window.openCartDrawer = function() {
+  renderCartDrawer();
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeCartDrawer = function() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+function renderCartDrawer() {
+  const items  = Cart.get();
+  const body   = document.getElementById('cartBody');
+  const footer = document.getElementById('cartFooter');
+
+  if (!items.length) {
+    body.innerHTML = `<div class="cart-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><strong>Tu carrito está vacío</strong><p>Explorá el catálogo y agregá productos</p></div>`;
+    footer.style.display = 'none';
+    return;
+  }
+
+  body.innerHTML = items.map(item => {
+    const variantStr = item.variant ? Object.entries(item.variant).map(([k,v]) => `${k}: ${v}`).join(', ') : '';
+    const img = item.image
+      ? `<img class="cart-item-img" src="${item.image}" alt="${item.name}" />`
+      : `<div class="cart-item-img" style="display:flex;align-items:center;justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brown-200)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`;
+    return `<div class="cart-item" data-key="${item._key}">
+      ${img}
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        ${variantStr ? `<div class="cart-item-variant">${variantStr}</div>` : ''}
+        <div class="cart-item-price">$${(item.price * item.qty).toLocaleString('es-AR')}</div>
+        <div class="cart-item-row">
+          <div class="qty-selector" style="transform:scale(.85);transform-origin:left">
+            <button class="qty-btn" onclick="updateCartQty('${item._key}',${item.qty - 1})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <span class="qty-value">${item.qty}</span>
+            <button class="qty-btn" onclick="updateCartQty('${item._key}',${item.qty + 1})">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+          <span class="cart-item-remove" onclick="removeCartItem('${item._key}')">Quitar</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderCartTotals();
+  footer.style.display = 'block';
+}
+
+window.updateCartQty = function(key, qty) {
+  Cart.updateQty(key, qty);
+  renderCartDrawer();
+};
+window.removeCartItem = function(key) {
+  Cart.remove(key);
+  renderCartDrawer();
+};
+
+function renderCartTotals() {
+  const subtotal = Cart.subtotal();
+  const discount = activeDiscount ? activeDiscount.amount : 0;
+  const total    = subtotal - discount;
+  document.getElementById('cartTotals').innerHTML = `
+    <div class="cart-total-row"><span>Subtotal</span><span>$${subtotal.toLocaleString('es-AR')}</span></div>
+    ${discount > 0 ? `<div class="cart-total-row" style="color:var(--wa-green)"><span>Descuento (${activeDiscount.code})</span><span>-$${discount.toLocaleString('es-AR')}</span></div>` : ''}
+    <div class="cart-total-row grand"><span>Total</span><span>$${total.toLocaleString('es-AR')}</span></div>`;
+}
+
+window.applyDiscountCode = async function() {
+  const code = document.getElementById('discountInput').value.trim().toUpperCase();
+  if (!code) return;
+  let discountData = null;
+  if (sb) {
+    const res = await sb.from('discount_codes').select('*').eq('code', code).eq('active', true).single();
+    discountData = res.data;
+  } else {
+    if (code === 'DEMO10') discountData = { type:'percent', value:10, min_purchase:0 };
+  }
+  if (!discountData) { showToast('Código inválido o expirado', 'error'); return; }
+  const result = Cart.applyDiscount(code, discountData);
+  if (!result) { showToast('No cumple el mínimo requerido', 'error'); return; }
+  activeDiscount = result;
+  renderCartTotals();
+  showToast(`Descuento ${code} aplicado`, 'success');
+};
+
+window.checkoutWa = function() {
+  if (!Cart.count()) return;
+  Cart.openWa(activeDiscount);
+};
+
+// =============================================
+// FAVORITES
+// =============================================
+window.toggleFav = function(e, id) {
+  e.stopPropagation();
+  const added = Favs.toggle(id);
+  updateBadges();
+  applyFilters();
+  showToast(added ? 'Guardado en favoritos' : 'Quitado de favoritos', added ? 'success' : 'default');
+};
+
+window.openFavsDrawer = function() {
+  renderFavsDrawer();
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('favsDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeFavsDrawer = function() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('favsDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+function renderFavsDrawer() {
+  const ids  = Favs.get();
+  const body = document.getElementById('favsBody');
+  const favProds = allProducts.filter(p => ids.includes(p.id));
+  if (!favProds.length) {
+    body.innerHTML = `<div class="cart-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><strong>Sin guardados</strong><p>Tocá el corazón en cualquier producto</p></div>`;
+    return;
+  }
+  body.innerHTML = favProds.map(p => `
+    <div class="cart-item">
+      ${p.images?.[0] ? `<img class="cart-item-img" src="${p.images[0]}" alt="${p.name}" />` : `<div class="cart-item-img" style="display:flex;align-items:center;justify-content:center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brown-200)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`}
+      <div class="cart-item-info">
+        <div class="cart-item-name">${p.name}</div>
+        <div class="cart-item-price">$${p.price.toLocaleString('es-AR')}</div>
+        <div class="cart-item-row" style="margin-top:8px">
+          <button class="btn btn-ghost" style="font-size:0.78rem;height:30px;padding:0 10px;border:1px solid var(--border);border-radius:var(--r-sm)" onclick="openProduct('${p.id}');closeFavsDrawer()">Ver producto</button>
+          <span class="cart-item-remove" onclick="toggleFav(event,'${p.id}');renderFavsDrawer()">Quitar</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// =============================================
+// COMMENTS
+// =============================================
+window.sendComment = function() {
+  const name = document.getElementById('commentName').value.trim() || 'Anónimo';
+  const text = document.getElementById('commentText').value.trim();
+  if (!text) { showToast('Escribí un mensaje antes de enviar', 'error'); return; }
+  const msg = encodeURIComponent(`💬 *Consulta LO QUIERO!*\n👤 ${name}\n\n${text}`);
+  window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
+  document.getElementById('commentText').value = '';
+  showToast('Mensaje enviado', 'success');
+};
+window.sendCommentBottom = function() {
+  const name  = document.getElementById('commentNameBottom').value.trim() || 'Anónimo';
+  const phone = document.getElementById('commentPhoneBottom').value.trim();
+  const text  = document.getElementById('commentTextBottom').value.trim();
+  if (!text) { showToast('Escribí un mensaje antes de enviar', 'error'); return; }
+  const extra = phone ? `\n📱 Tel: ${phone}` : '';
+  const msg = encodeURIComponent(`💬 *Consulta LO QUIERO!*\n👤 ${name}${extra}\n\n${text}`);
+  window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
+  document.getElementById('commentTextBottom').value = '';
+  showToast('Mensaje enviado', 'success');
+};
+
+// =============================================
+// SIDEBAR TOGGLE (collapse to icon rail)
+// =============================================
+function setupSidebar() {
+  const toggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('mainSidebar');
+  if (!toggle || !sidebar) return;
+
+  // Restore saved state
+  const saved = localStorage.getItem('lq_sidebar_collapsed') === 'true';
+  sidebar.classList.toggle('collapsed', saved);
+
+  toggle.addEventListener('click', () => {
+    const collapsed = sidebar.classList.toggle('collapsed');
+    localStorage.setItem('lq_sidebar_collapsed', collapsed);
+  });
+}
+
+window.expandSidebar = function() {
+  const sidebar = document.getElementById('mainSidebar');
+  sidebar.classList.remove('collapsed');
+  localStorage.setItem('lq_sidebar_collapsed', 'false');
+};
+
+// =============================================
+// MOBILE NAV
+// =============================================
+window.mobileNav = function(tab, btn) {
+  document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (tab === 'search') { openMobileSearch(); }
+  else { closeMobileSearch(); }
+  if (tab === 'favs') openFavsDrawer();
+};
+
+window.openFiltersMobile = function() {
+  const filtersModal = document.getElementById('filtersModal');
+  // Clone sidebar filter content into mobile sheet
+  const sidebar = document.getElementById('mainSidebar');
+  document.getElementById('mobileFiltersContent').innerHTML = sidebar.querySelector('.sidebar-card').innerHTML;
+  filtersModal.classList.add('open');
+};
+window.closeFiltersMobile = function(e) {
+  if (e && e.target !== document.getElementById('filtersModal')) return;
+  document.getElementById('filtersModal').classList.remove('open');
+};
+
+// =============================================
+// HEADER BUTTONS
+// =============================================
+document.getElementById('btnFavs').addEventListener('click', openFavsDrawer);
+document.getElementById('btnCart').addEventListener('click', openCartDrawer);
+
+// =============================================
+// BADGES
+// =============================================
+function updateBadges() {
+  const cartCount = Cart.count();
+  const favCount  = Favs.count();
+  ['cartBadge','mobileCartBadge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = cartCount; el.style.display = cartCount > 0 ? 'flex' : 'none'; }
+  });
+  const favsBadge = document.getElementById('favsBadge');
+  if (favsBadge) { favsBadge.textContent = favCount; favsBadge.style.display = favCount > 0 ? 'flex' : 'none'; }
+}
+
+// =============================================
+// TOAST
+// =============================================
+window.showToast = function(msg, type = 'default') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { success:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--wa-green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`, error:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e63946" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`, default:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-amber)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` };
+  toast.innerHTML = `${icons[type] || icons.default}<span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(6px)'; toast.style.transition = 'all .3s'; setTimeout(() => toast.remove(), 300); }, 3000);
+};
+
+// =============================================
+// ESC key closes modals
+// =============================================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeProductModal();
+    closeCartDrawer();
+    closeFavsDrawer();
+    closeMobileSearch();
+  }
+});
+
+// =============================================
+// BOOT
+// =============================================
+init();
+</script>
 </body>
 </html>
