@@ -28,15 +28,16 @@
 </div>
 
 <!-- ==================== HEADER ==================== -->
+<div class="header-wrap">
 <header class="site-header">
   <!-- Logo -->
   <a href="/" class="header-logo" aria-label="LO QUIERO! inicio">
-    <!-- <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect width="32" height="32" rx="8" fill="#E85002"/>
       <path d="M8 11c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.21-1.79 4-4 4" stroke="#FFA500" stroke-width="2.5" stroke-linecap="round"/>
       <path d="M16 11c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.21-1.79 4-4 4" stroke="#FFD166" stroke-width="2.5" stroke-linecap="round"/>
       <path d="M7 15c0 5 3.5 9 9 10 5.5-1 9-5 9-10" stroke="white" stroke-width="2" stroke-linecap="round"/>
-    </svg> -->
+    </svg>
     <span>LO <span class="excl">QUIERO!</span></span>
   </a>
 
@@ -76,6 +77,7 @@
     </a>
   </div>
 </header>
+</div>
 
 <!-- ==================== MOBILE SEARCH OVERLAY ==================== -->
 <div class="mobile-search-overlay" id="mobileSearchOverlay">
@@ -96,129 +98,77 @@
   <span class="mobile-search-cancel" onclick="closeMobileSearch()">Cancelar</span>
 </div>
 
-<!-- ==================== CATEGORY BAR ==================== -->
-<nav class="cat-bar" aria-label="Categorías">
-  <div class="cat-bar-inner" id="catBarInner">
-    <button class="cat-pill active" data-cat="all" onclick="filterCategory('all', this)">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Todo
-    </button>
-    <!-- More populated by JS -->
+<!-- ==================== TOOLBAR (Categorías / Filtros dropdowns) ==================== -->
+<nav class="toolbar" aria-label="Categorías y filtros">
+  <div class="toolbar-inner">
+
+    <!-- Categorías dropdown -->
+    <div class="dropdown" id="catDropdown">
+      <button class="dropdown-btn" onclick="toggleDropdown('catDropdown',event)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Categorías
+        <svg class="dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="dropdown-panel" id="catDropdownPanel">
+        <button class="dropdown-item active" data-cat="all" onclick="filterCategory('all', this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Todo
+        </button>
+        <!-- More populated by JS -->
+      </div>
+    </div>
+
+    <!-- Filtros dropdown -->
+    <div class="dropdown" id="filterDropdown">
+      <button class="dropdown-btn" onclick="toggleDropdown('filterDropdown',event)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
+        Filtros
+        <span class="filter-active-dot" id="filterActiveDot" style="display:none"></span>
+        <svg class="dropdown-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="dropdown-panel filter-panel" id="filterDropdownPanel">
+        <div class="filter-group">
+          <div class="filter-group-label">Estado</div>
+          <div class="filter-chips">
+            <button class="filter-chip active" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">Todos</button>
+            <button class="filter-chip" data-filter="status" data-val="new" onclick="setFilter('status','new',this)">Nuevo</button>
+            <button class="filter-chip" data-filter="status" data-val="used" onclick="setFilter('status','used',this)">Usado</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Disponibilidad</div>
+          <div class="filter-chips">
+            <button class="filter-chip active" data-filter="stock" data-val="all" onclick="setFilter('stock','all',this)">Todos</button>
+            <button class="filter-chip" data-filter="stock" data-val="in" onclick="setFilter('stock','in',this)">En stock</button>
+            <button class="filter-chip" data-filter="stock" data-val="out" onclick="setFilter('stock','out',this)">Sin stock</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Precio</div>
+          <div class="price-inputs">
+            <input type="number" class="price-input" id="priceMin" placeholder="Mín $" min="0" oninput="applyFilters();updateFilterActiveDot()" aria-label="Precio mínimo" />
+            <span class="price-sep">—</span>
+            <input type="number" class="price-input" id="priceMax" placeholder="Máx $" min="0" oninput="applyFilters();updateFilterActiveDot()" aria-label="Precio máximo" />
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">Oferta</div>
+          <div class="filter-chips">
+            <button class="filter-chip" data-filter="offer" data-val="discount" onclick="setFilter('offer','discount',this)">Con descuento</button>
+          </div>
+        </div>
+        <button class="btn btn-outline" style="width:100%;margin-top:4px;font-size:0.82rem" onclick="clearFilters()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+
   </div>
 </nav>
 
 <!-- ==================== PAGE LAYOUT ==================== -->
 <div class="page-layout">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="mainSidebar" aria-label="Filtros">
-
-    <!-- Sidebar header with collapse toggle -->
-    <div class="sidebar-header">
-      <span class="sidebar-header-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
-        Panel
-      </span>
-      <button class="sidebar-collapse-btn" id="sidebarToggle" aria-label="Colapsar panel" title="Colapsar panel">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-    </div>
-
-    <div class="sidebar-content" id="sidebarContent">
-
-    <!-- Filters -->
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
-        Filtros
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-label">Estado</div>
-        <div class="filter-chips">
-          <button class="filter-chip active" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">Todos</button>
-          <button class="filter-chip" data-filter="status" data-val="new" onclick="setFilter('status','new',this)">Nuevo</button>
-          <button class="filter-chip" data-filter="status" data-val="used" onclick="setFilter('status','used',this)">Usado</button>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-label">Disponibilidad</div>
-        <div class="filter-chips">
-          <button class="filter-chip active" data-filter="stock" data-val="all" onclick="setFilter('stock','all',this)">Todos</button>
-          <button class="filter-chip" data-filter="stock" data-val="in" onclick="setFilter('stock','in',this)">En stock</button>
-          <button class="filter-chip" data-filter="stock" data-val="out" onclick="setFilter('stock','out',this)">Sin stock</button>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-label">Precio</div>
-        <div class="price-inputs">
-          <input type="number" class="price-input" id="priceMin" placeholder="Mín $" min="0" oninput="applyFilters()" aria-label="Precio mínimo" />
-          <span class="price-sep">—</span>
-          <input type="number" class="price-input" id="priceMax" placeholder="Máx $" min="0" oninput="applyFilters()" aria-label="Precio máximo" />
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <div class="filter-group-label">Oferta</div>
-        <div class="filter-chips">
-          <button class="filter-chip" data-filter="offer" data-val="discount" onclick="setFilter('offer','discount',this)">Con descuento</button>
-        </div>
-      </div>
-
-      <button class="btn btn-outline" style="width:100%;margin-top:8px;font-size:0.82rem" onclick="clearFilters()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        Limpiar filtros
-      </button>
-    </div>
-
-    <!-- Favorites mini list -->
-    <div class="sidebar-card" id="sidebarFavs" style="display:none">
-      <div class="sidebar-card-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        Favoritos guardados
-      </div>
-      <div id="sidebarFavsList"></div>
-    </div>
-
-    <!-- Comments -->
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        Comentarios privados
-      </div>
-      <p style="font-size:0.8rem;color:var(--text-3);margin-bottom:12px;line-height:1.5">
-        ¿Tenés una consulta o sugerencia? Te respondo por WhatsApp.
-      </p>
-      <div class="comment-form">
-        <input type="text" class="form-input" id="commentName" placeholder="Tu nombre (opcional)" aria-label="Tu nombre" />
-        <textarea class="form-input form-textarea" id="commentText" placeholder="Tu mensaje…" aria-label="Mensaje"></textarea>
-        <button class="btn btn-primary" style="width:100%" onclick="sendComment()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Enviar
-        </button>
-      </div>
-    </div>
-
-    </div><!-- /sidebar-content -->
-
-    <!-- Collapsed state: icon rail -->
-    <div class="sidebar-rail" id="sidebarRail">
-      <button class="sidebar-rail-btn" onclick="expandSidebar()" title="Filtros" aria-label="Mostrar filtros">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
-      </button>
-      <button class="sidebar-rail-btn" onclick="expandSidebar()" title="Favoritos guardados" aria-label="Mostrar favoritos">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-      <button class="sidebar-rail-btn" onclick="expandSidebar()" title="Comentarios privados" aria-label="Mostrar comentarios">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      </button>
-      <button class="sidebar-rail-btn sidebar-rail-expand" onclick="expandSidebar()" title="Expandir panel" aria-label="Expandir panel">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>
-  </aside>
 
   <!-- ==================== CATALOG MAIN ==================== -->
   <main class="catalog-main" id="catalogMain">
@@ -393,8 +343,8 @@
 <div class="modal-overlay" id="productModal" onclick="closeProductModal(event)" role="dialog" aria-modal="true" aria-label="Detalle del producto">
   <div class="modal-sheet" id="productModalSheet">
     <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeProductModal()" aria-label="Cerrar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <button class="modal-close" onclick="closeProductModal()" aria-label="Volver">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <div id="productModalContent"></div>
   </div>
@@ -418,12 +368,131 @@
 
 <!-- ==================== MAIN SCRIPT ==================== -->
 <script type="module">
-import { Cart, Favs, orderSingleProduct } from './store.js';
+// ============================================
+// Cart & favorites state (formerly store.js — embedded directly)
+// ============================================
+const CART_KEY = 'lq_cart';
+const FAVS_KEY = 'lq_favs';
+const WA_NUMBER = '5493445440326';
+
+// ---- CART ----
+const Cart = {
+  get() {
+    try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); }
+    catch { return []; }
+  },
+  save(items) {
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+    Cart._emit();
+  },
+  add(product, qty = 1, variant = null) {
+    const items = Cart.get();
+    const key = variant ? `${product.id}__${JSON.stringify(variant)}` : product.id;
+    const existing = items.find(i => i._key === key);
+    if (existing) {
+      existing.qty += qty;
+    } else {
+      items.push({
+        _key: key,
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        compare_price: product.compare_price,
+        image: product.images?.[0] || null,
+        variant,
+        qty,
+        category: product.category_name || ''
+      });
+    }
+    Cart.save(items);
+  },
+  remove(key) {
+    Cart.save(Cart.get().filter(i => i._key !== key));
+  },
+  updateQty(key, qty) {
+    if (qty <= 0) return Cart.remove(key);
+    const items = Cart.get();
+    const item = items.find(i => i._key === key);
+    if (item) { item.qty = qty; Cart.save(items); }
+  },
+  clear() { Cart.save([]); },
+  count() { return Cart.get().reduce((sum, i) => sum + i.qty, 0); },
+  subtotal() { return Cart.get().reduce((sum, i) => sum + i.price * i.qty, 0); },
+
+  applyDiscount(code, discountData) {
+    if (!discountData) return null;
+    const sub = Cart.subtotal();
+    if (discountData.min_purchase && sub < discountData.min_purchase) return null;
+    const amount = discountData.type === 'percent'
+      ? sub * (discountData.value / 100)
+      : Math.min(discountData.value, sub);
+    return { amount: Math.round(amount * 100) / 100, code, ...discountData };
+  },
+
+  buildWaMessage(discount = null) {
+    const items = Cart.get();
+    if (!items.length) return null;
+    const lines = items.map(i => {
+      const variantStr = i.variant ? ` (${Object.values(i.variant).join(', ')})` : '';
+      return `• ${i.qty}x ${i.name}${variantStr} — $${(i.price * i.qty).toLocaleString('es-AR')}`;
+    });
+    const subtotal = Cart.subtotal();
+    const discountLine = discount ? `\n🏷️ Descuento (${discount.code}): -$${discount.amount.toLocaleString('es-AR')}` : '';
+    const total = discount ? subtotal - discount.amount : subtotal;
+    const msg = `🛍️ *Hola! Quiero encargar:*\n\n${lines.join('\n')}\n${discountLine}\n\n💰 *Total: $${total.toLocaleString('es-AR')}*\n\n¿Está disponible?`;
+    return encodeURIComponent(msg);
+  },
+
+  openWa(discount = null) {
+    const msg = Cart.buildWaMessage(discount);
+    if (!msg) return;
+    window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
+  },
+
+  _listeners: [],
+  onChange(fn) { Cart._listeners.push(fn); },
+  _emit() { Cart._listeners.forEach(fn => fn(Cart.get())); }
+};
+
+// ---- FAVORITES ----
+const Favs = {
+  get() {
+    try { return JSON.parse(localStorage.getItem(FAVS_KEY) || '[]'); }
+    catch { return []; }
+  },
+  save(ids) {
+    localStorage.setItem(FAVS_KEY, JSON.stringify(ids));
+    Favs._emit();
+  },
+  toggle(id) {
+    const favs = Favs.get();
+    const idx = favs.indexOf(id);
+    if (idx === -1) favs.push(id);
+    else favs.splice(idx, 1);
+    Favs.save(favs);
+    return idx === -1;
+  },
+  has(id) { return Favs.get().includes(id); },
+  count() { return Favs.get().length; },
+  _listeners: [],
+  onChange(fn) { Favs._listeners.push(fn); },
+  _emit() { Favs._listeners.forEach(fn => fn(Favs.get())); }
+};
+
+// ---- SINGLE PRODUCT ORDER (quick WA) ----
+function orderSingleProduct(product, qty, variant, discountAmount = 0) {
+  const variantStr = variant ? ` (${Object.values(variant).join(', ')})` : '';
+  const subtotal = product.price * qty;
+  const total = subtotal - discountAmount;
+  const msg = encodeURIComponent(
+    `🛍️ *Hola! Quiero encargar:*\n\n• ${qty}x ${product.name}${variantStr} — $${total.toLocaleString('es-AR')}\n\n¿Está disponible?`
+  );
+  window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
+}
 
 // ---- Config (replace with your Supabase project) ----
 const SUPABASE_URL     = 'https://TU_PROYECTO.supabase.co';
 const SUPABASE_ANON_KEY = 'TU_ANON_KEY';
-const WA_NUMBER = '5493445440326';
 
 let sb = null;
 const isConfigured = !SUPABASE_URL.includes('TU_PROYECTO') && !SUPABASE_ANON_KEY.includes('TU_ANON_KEY');
@@ -460,6 +529,7 @@ async function init() {
 
   setupSearch();
   setupSidebar();
+  setupModalDrag();
 
   // Show comment section at bottom on desktop
   if (window.innerWidth >= 769) {
@@ -572,15 +642,15 @@ async function loadSections() {
 // RENDER CATEGORY BAR
 // =============================================
 function renderCategoryBar() {
-  const inner = document.getElementById('catBarInner');
+  const inner = document.getElementById('catDropdownPanel');
   const catIcons = { cpu:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>', home:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>', utensils:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/></svg>', layers:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>', shirt:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>', droplets:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/></svg>' };
-  const pills = categories.map(c => `
-    <button class="cat-pill" data-cat="${c.slug}" onclick="filterCategory('${c.slug}', this)">
+  const items = categories.map(c => `
+    <button class="dropdown-item" data-cat="${c.slug}" onclick="filterCategory('${c.slug}', this)">
       ${catIcons[c.icon] || ''}
       ${c.name}
     </button>
   `).join('');
-  inner.innerHTML = inner.children[0].outerHTML + pills;
+  inner.innerHTML = inner.children[0].outerHTML + items;
 }
 
 function renderFooterCats() {
@@ -680,11 +750,12 @@ function renderProductCard(p) {
 // =============================================
 window.filterCategory = function(slug, btn) {
   activeFilters.category = slug;
-  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.dropdown-item[data-cat]').forEach(p => p.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  else document.querySelector(`.cat-pill[data-cat="${slug}"]`)?.classList.add('active');
+  else document.querySelector(`.dropdown-item[data-cat="${slug}"]`)?.classList.add('active');
   applyFilters();
   document.getElementById('gridTitle').textContent = slug === 'all' ? 'Todos los productos' : (categories.find(c=>c.slug===slug)?.name || 'Productos');
+  closeDropdown('catDropdown');
 };
 
 window.setFilter = function(type, val, btn) {
@@ -692,18 +763,25 @@ window.setFilter = function(type, val, btn) {
   document.querySelectorAll(`[data-filter="${type}"]`).forEach(b => b.classList.remove('active'));
   btn?.classList.add('active');
   applyFilters();
+  updateFilterActiveDot();
 };
 
 window.clearFilters = function() {
   activeFilters = { category: 'all', status: 'all', stock: 'all', offer: null, q: '' };
   document.getElementById('searchInput').value = '';
   document.querySelectorAll('.filter-chip').forEach(c => { c.classList.remove('active'); if (c.dataset.val === 'all') c.classList.add('active'); });
-  document.querySelectorAll('.cat-pill').forEach(p => { p.classList.remove('active'); if (p.dataset.cat === 'all') p.classList.add('active'); });
+  document.querySelectorAll('.dropdown-item[data-cat]').forEach(p => { p.classList.remove('active'); if (p.dataset.cat === 'all') p.classList.add('active'); });
   document.getElementById('priceMin').value = '';
   document.getElementById('priceMax').value = '';
   document.getElementById('gridTitle').textContent = 'Todos los productos';
   applyFilters();
+  updateFilterActiveDot();
 };
+
+window.updateFilterActiveDot = function() {
+  const isActive = activeFilters.status !== 'all' || activeFilters.stock !== 'all' || activeFilters.offer || document.getElementById('priceMin').value || document.getElementById('priceMax').value;
+  document.getElementById('filterActiveDot').style.display = isActive ? 'inline-block' : 'none';
+}
 
 window.applyFilters = function() {
   const sort = document.getElementById('sortSelect').value;
@@ -819,10 +897,13 @@ window.openProduct = function(id) {
   const priceFmt = n => '$' + Number(n).toLocaleString('es-AR');
 
   const images = p.images?.length ? p.images : [];
+  const favBtnHtml = `<button class="card-fav detail-gallery-fav ${isFav?'saved':''}" onclick="toggleFav(event,'${p.id}')" aria-label="${isFav ? 'Quitar de favoritos' : 'Guardar en favoritos'}" aria-pressed="${isFav}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="${isFav?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>`;
   const gallery = images.length
-    ? `<div class="detail-gallery" id="detailGallery"><img id="detailMainImg" src="${images[0]}" alt="${p.name}" /></div>
+    ? `<div class="detail-gallery" id="detailGallery">${favBtnHtml}<img id="detailMainImg" src="${images[0]}" alt="${p.name}" /></div>
        ${images.length > 1 ? `<div class="gallery-thumbs">${images.map((src,i) => `<img class="gallery-thumb ${i===0?'active':''}" src="${src}" onclick="setDetailImg('${src}',this)" alt="Imagen ${i+1}" />`).join('')}</div>` : ''}`
-    : `<div class="detail-gallery" style="display:flex;align-items:center;justify-content:center;"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--brown-200)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    : `<div class="detail-gallery" style="display:flex;align-items:center;justify-content:center;">${favBtnHtml}<svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--brown-200)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
   // Variants
   const variants = p.variants || [];
@@ -839,58 +920,68 @@ window.openProduct = function(id) {
       </div>
     </div>`).join('');
 
-  const compareHtml = p.compare_price ? `<span style="font-size:1rem;color:var(--text-3);text-decoration:line-through;font-weight:600">$${Number(p.compare_price).toLocaleString('es-AR')}</span>` : '';
+  const compareHtml = p.compare_price ? `<span class="detail-compare-price">$${Number(p.compare_price).toLocaleString('es-AR')}</span>` : '';
 
   content.innerHTML = `
-    ${gallery}
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
-      <div>
-        ${p.categories?.name ? `<div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:var(--accent);margin-bottom:4px">${p.categories.name}</div>` : ''}
-        <h2 style="font-family:var(--font-display);font-size:1.35rem;font-weight:800;line-height:1.2;color:var(--text-1)">${p.name}</h2>
+    <div class="detail-layout">
+      <div class="detail-gallery-col">
+        ${gallery}
       </div>
-      <button class="card-fav ${isFav?'saved':''}" onclick="toggleFav(event,'${p.id}')" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--brown-100);display:flex;align-items:center;justify-content:center" aria-label="Favorito">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="${isFav?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-    </div>
-
-    ${p.description ? `<p style="font-size:0.9rem;color:var(--text-2);line-height:1.65;margin-bottom:16px">${p.description}</p>` : ''}
-
-    ${variantsHtml}
-
-    <div style="display:flex;align-items:center;gap:16px;margin:16px 0">
-      <div style="display:flex;flex-direction:column">
-        <div style="display:flex;align-items:baseline;gap:8px">
-          <span style="font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--accent)">${priceFmt(p.price)}</span>
-          ${compareHtml}
+      <div class="detail-info-col">
+        <div class="detail-header-row">
+          <div>
+            ${p.categories?.name ? `<div class="detail-category">${p.categories.name}</div>` : ''}
+            <h2 class="detail-name">${p.name}</h2>
+          </div>
         </div>
-        ${p.discount_pct > 0 ? `<span style="font-size:0.78rem;font-weight:800;color:white;background:var(--accent);padding:2px 8px;border-radius:var(--r-full);width:fit-content">${p.discount_pct}% OFF</span>` : ''}
-      </div>
-      <div style="margin-left:auto">
-        <div class="qty-selector" id="detailQtySelector">
-          <button class="qty-btn" onclick="changeDetailQty(-1)" aria-label="Restar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <span class="qty-value" id="detailQty">1</span>
-          <button class="qty-btn" onclick="changeDetailQty(1)" aria-label="Sumar">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
 
-    ${noStock
-      ? `<button class="btn" style="width:100%;background:var(--brown-100);color:var(--text-3);cursor:not-allowed;height:50px;border-radius:var(--r-lg)" disabled>Sin stock por el momento</button>`
-      : `<div style="display:flex;gap:10px">
-          <button class="btn btn-outline" style="flex:1;height:50px" onclick="addToCartFromModal('${p.id}')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            Al carrito
-          </button>
-          <button class="btn btn-wa" style="flex:2;height:50px" onclick="orderFromModal('${p.id}')">
+        ${p.description ? `<p class="detail-desc">${p.description}</p>` : ''}
+
+        ${variantsHtml}
+
+        <div class="detail-purchase-box">
+          <div class="detail-price-row">
+            <span class="detail-price">${priceFmt(p.price)}</span>
+            ${compareHtml}
+            ${p.discount_pct > 0 ? `<span class="detail-discount-badge">${p.discount_pct}% OFF</span>` : ''}
+          </div>
+
+          ${noStock
+            ? `<div class="detail-stock-pill out">Sin stock por el momento</div>`
+            : `<div class="detail-stock-pill in">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                En stock
+              </div>`
+          }
+
+          <div class="detail-actions-row">
+            <div class="qty-selector" id="detailQtySelector">
+              <button class="qty-btn" onclick="changeDetailQty(-1)" aria-label="Restar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <span class="qty-value" id="detailQty">1</span>
+              <button class="qty-btn" onclick="changeDetailQty(1)" aria-label="Sumar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+            </div>
+
+            ${noStock
+              ? `<button class="btn" style="flex:1;background:var(--brown-100);color:var(--text-3);cursor:not-allowed;height:50px;border-radius:var(--r-lg)" disabled>No disponible</button>`
+              : `<button class="btn btn-outline detail-btn-cart" onclick="addToCartFromModal('${p.id}')">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                  Al carrito
+                </button>`
+            }
+          </div>
+
+          ${!noStock ? `
+          <button class="btn btn-wa detail-btn-order" onclick="orderFromModal('${p.id}')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Encargar
-          </button>
-        </div>`
-    }`;
+            Encargar por WhatsApp
+          </button>` : ''}
+        </div>
+      </div>
+    </div>`;
 
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -907,6 +998,46 @@ window.setDetailImg = function(src, thumb) {
   document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
   thumb.classList.add('active');
 };
+
+// =============================================
+// DRAG-TO-DISMISS (mobile modal sheet)
+// =============================================
+function setupModalDrag() {
+  const sheet = document.getElementById('productModalSheet');
+  let startY = 0, currentY = 0, dragging = false;
+
+  const onStart = (e) => {
+    if (window.innerWidth >= 769) return;
+    // Only start drag from the top handle area or when content is scrolled to top
+    if (sheet.scrollTop > 4) return;
+    startY = (e.touches ? e.touches[0].clientY : e.clientY);
+    dragging = true;
+    sheet.style.transition = 'none';
+  };
+  const onMove = (e) => {
+    if (!dragging) return;
+    currentY = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
+    if (currentY < 0) currentY = 0;
+    sheet.style.transform = `translateY(${currentY}px)`;
+  };
+  const onEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    if (currentY > 120) {
+      closeProductModal();
+    }
+    sheet.style.transform = '';
+    currentY = 0;
+  };
+
+  sheet.addEventListener('touchstart', onStart, { passive: true });
+  sheet.addEventListener('touchmove', onMove, { passive: true });
+  sheet.addEventListener('touchend', onEnd);
+  sheet.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+}
 
 let detailQty = 1;
 window.changeDetailQty = function(delta) {
@@ -1118,27 +1249,30 @@ window.sendCommentBottom = function() {
 };
 
 // =============================================
-// SIDEBAR TOGGLE (collapse to icon rail)
+// DROPDOWNS (Categorías / Filtros)
 // =============================================
 function setupSidebar() {
-  const toggle = document.getElementById('sidebarToggle');
-  const sidebar = document.getElementById('mainSidebar');
-  if (!toggle || !sidebar) return;
-
-  // Restore saved state
-  const saved = localStorage.getItem('lq_sidebar_collapsed') === 'true';
-  sidebar.classList.toggle('collapsed', saved);
-
-  toggle.addEventListener('click', () => {
-    const collapsed = sidebar.classList.toggle('collapsed');
-    localStorage.setItem('lq_sidebar_collapsed', collapsed);
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.dropdown.open').forEach(d => {
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
   });
 }
 
-window.expandSidebar = function() {
-  const sidebar = document.getElementById('mainSidebar');
-  sidebar.classList.remove('collapsed');
-  localStorage.setItem('lq_sidebar_collapsed', 'false');
+window.toggleDropdown = function(id, event) {
+  if (event) event.stopPropagation();
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+};
+
+window.closeDropdown = function(id) {
+  document.getElementById(id)?.classList.remove('open');
 };
 
 // =============================================
@@ -1154,9 +1288,16 @@ window.mobileNav = function(tab, btn) {
 
 window.openFiltersMobile = function() {
   const filtersModal = document.getElementById('filtersModal');
-  // Clone sidebar filter content into mobile sheet
-  const sidebar = document.getElementById('mainSidebar');
-  document.getElementById('mobileFiltersContent').innerHTML = sidebar.querySelector('.sidebar-card').innerHTML;
+  // Clone filter dropdown content into mobile sheet, renaming IDs to avoid duplicates
+  const filterPanel = document.getElementById('filterDropdownPanel');
+  let html = filterPanel.innerHTML;
+  html = html.replace(/id="priceMin"/g, 'id="priceMinMobile"').replace(/id="priceMax"/g, 'id="priceMaxMobile"');
+  document.getElementById('mobileFiltersContent').innerHTML = html;
+  // Sync current values
+  document.getElementById('priceMinMobile').value = document.getElementById('priceMin').value;
+  document.getElementById('priceMaxMobile').value = document.getElementById('priceMax').value;
+  document.getElementById('priceMinMobile').oninput = () => { document.getElementById('priceMin').value = document.getElementById('priceMinMobile').value; applyFilters(); updateFilterActiveDot(); };
+  document.getElementById('priceMaxMobile').oninput = () => { document.getElementById('priceMax').value = document.getElementById('priceMaxMobile').value; applyFilters(); updateFilterActiveDot(); };
   filtersModal.classList.add('open');
 };
 window.closeFiltersMobile = function(e) {
